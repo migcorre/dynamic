@@ -1,3 +1,6 @@
+Here We will go throughtout the necessary steps for going from RTL, passing for Its synthesis and double checking the synthesis results throught simulation. \
+Before that We need to install the necessary tools:
+
 ## *Yosys installation:* 
 Yosys is a RTL synthesis with extensive Verilog 2005 support \
 
