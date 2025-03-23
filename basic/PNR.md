@@ -37,6 +37,28 @@ sudo ./etc/DependencyInstaller.sh -all
 sudo ./etc/Build.sh
 ```
 
+### MAGIC
+# Install Magic VLSI
+install the libraries that will be necessary for install magic
+```
+sudo apt install -y irsim csh tcsh tcl-dev tk-dev \
+  libcairo2-dev mesa-common-dev
+```
+clone repository:
+```
+ git clone https://github.com/RTimothyEdwards/magic
+```
+
+cd magic
+./configure --prefix=/opt/magic-8.3
+make
+sudo make install
+
+add the following line to ~/.bashrc, to be visible magic from everywhere
+```
+export PATH="/opt/magic-8.3/bin:$PATH"
+```
+
 ### OpenROAD-flow-scripts
 I saw that for start to know the use of OpenRoad I need to see same examples of how to use it. for that reason I proceed to install OpenROAD-flow-scripts from
 ```
