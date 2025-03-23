@@ -2,14 +2,14 @@ Here We will go throughtout the necessary steps for going from RTL, passing for 
 Before that We need to install the necessary tools:
 
 ## *Yosys installation:* 
-Yosys is a RTL synthesis with extensive Verilog 2005 support \
+Yosys is a RTL synthesis with extensive Verilog 2005 support 
 
 2 ways: \
 number 1: yosys inside OSS CAD suite. has many soft inluding yosys.
 this way is almost straightforward"
  Download oss-cad-suite from https://github.com/YosysHQ/oss-cad-suite-build/releases/tag/2024-11-07 This containt yosys. \
  Extract \
- yosys will be installed in oss-cad-suite/bin folder. you can run here running > ./yosys or adding the path to $PATH variable to the bash interface. This is adding the following line into ~/.bashrc file \
+ yosys will be installed in oss-cad-suite/bin folder. you can run here running > ./yosys or adding the path to $PATH variable to the bash interface. This is adding the following line into ~/.bashrc file 
 ```
 export PATH="<extracted_location>/oss-cad-suite/bin:$PATH" 
 ```
