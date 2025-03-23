@@ -36,3 +36,9 @@ The I ran:
 sudo ./etc/DependencyInstaller.sh -all
 sudo ./etc/Build.sh
 ```
+
+### OpenROAD-flow-scripts
+I saw that for start to know the use of OpenRoad I need to see same examples of how to use it. for that reason I proceed to install OpenROAD-flow-scripts from
+```
+https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts/tree/master
+```
