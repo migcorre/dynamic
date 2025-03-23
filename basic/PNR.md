@@ -38,7 +38,7 @@ sudo ./etc/Build.sh
 ```
 
 ### MAGIC
-# Install Magic VLSI
+
 install the libraries that will be necessary for install magic
 ```
 sudo apt install -y irsim csh tcsh tcl-dev tk-dev \
