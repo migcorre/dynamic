@@ -35,6 +35,13 @@ The I ran:
 ```
 sudo ./etc/DependencyInstaller.sh -all
 sudo ./etc/Build.sh
+
+### OpenROAD-flow-scripts
+I saw that for start to know the use of OpenRoad I need to see same examples of how to use it. for that reason I proceed to install OpenROAD-flow-scripts from
+```
+https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts/tree/master
+```
+
 ```
 
 ### MAGIC
@@ -50,17 +57,12 @@ clone repository:
 ```
 
 cd magic
-./configure --prefix=/opt/magic-8.3
+./configure 
 make
 sudo make install
 
 add the following line to ~/.bashrc, to be visible magic from everywhere
 ```
-export PATH="/opt/magic-8.3/bin:$PATH"
+export PATH="/usr/local/magic-8.3/bin:$PATH"
 ```
 
-### OpenROAD-flow-scripts
-I saw that for start to know the use of OpenRoad I need to see same examples of how to use it. for that reason I proceed to install OpenROAD-flow-scripts from
-```
-https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts/tree/master
-```
