@@ -49,6 +49,8 @@ endmodule
 
 We put this file under project folder into /src/rtl with the name counter.v
 
+## basic synthesis script
+
 And We start to build our sythesis script under /scripts folder in the main folder.
 
 ```tcl
@@ -78,7 +80,7 @@ export DESIGN__SCRIPTS_DIR="../scripts"
 ```
 we will lauch all from a work directory under main folder.
 
-We create the bash script that will run our synthesis.
+We create the bash script that will run our synthesis (run_syn.sh).
 
 ```bash
 #!/bin/sh
@@ -87,3 +89,35 @@ We create the bash script that will run our synthesis.
 yosys -c ${DESIGN__SCRIPTS_DIR}/synthesis.tcl
 ```
 
+## Mapping libraries
+We will add the library that will be use to map our generic netlist. We add a variable in global.sh
+```sh
+export TECH__LIBS="/usr/local/share/pdk/sky130B/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__ss_n40C_1v28.lib"
+```
+
+and add 2 lines to the synthesis script:
+```tcl
+# mapping to $::env(TECH__LIBS)
+dfflibmap -liberty $::env(TECH__LIBS)
+abc -liberty $::env(TECH__LIBS)
+clean
+```
+then our final synthesis script:
+
+```tcl
+yosys -import
+# read design
+read_verilog $::env(DESIGN__RTL_DIR)/counter.v
+
+# elaborate design hierarchy
+hierarchy -check -top $::env(DESIGN__TOP_NAME)
+
+synth -top counter
+
+dfflibmap -liberty $::env(TECH__LIBS)
+abc -liberty $::env(TECH__LIBS)
+clean
+
+# write synthesized design
+write_verilog $::env(DESIGN__OUTPUTS_DIR)/$::env(DESIGN__TOP_NAME).v
+```
