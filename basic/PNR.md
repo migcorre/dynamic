@@ -66,3 +66,7 @@ add the following line to ~/.bashrc, to be visible magic from everywhere
 export PATH="/usr/local/magic-8.3/bin:$PATH"
 ```
 
+### PDK
+We will use the skywater130 PDK for the example flow. \
+installation...follow the following link \
+http://www.opencircuitdesign.com/open_pdks/install.html
