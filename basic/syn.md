@@ -3,6 +3,7 @@ We will generate a verilog netlist starting from a RTL using [yosys tool](https:
 
 We will use a project_name folder from where we will deploy the following structure directories:
 
+```
 ├── work
     └── run_syn.sh
 ├── inputs
@@ -15,6 +16,7 @@ We will use a project_name folder from where we will deploy the following struct
     └── synthesis.tcl
 ├── vars
     └── globals.sh
+```
 
 work = directory where we can find the main executable of each stage (synthesys, floorplan,place,cts...)
 inputs = all the necesary files for the tools
@@ -70,7 +72,8 @@ We see global variables that will be load previus synthesis script. We will save
 #
 export DESIGN__TOP_NAME="counter"
 export DESIGN__OUTPUTS_DIR="../outputs"
-export DESIGN__RTL_DIR="../src/rtl"
+export DESIGN__RTL_DIR="../inputs/rtl"
+export DESIGN__SDC_DIR="../inputs/rtl"
 export DESIGN__SCRIPTS_DIR="../scripts"
 ```
 we will lauch all from a work directory under main folder.
