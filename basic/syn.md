@@ -34,7 +34,7 @@ pdk = files necesaries to run this example. Files inside this folder are getting
 
 
 ## RTL example
-Wi will use the following example RTL, a basic ounter 8bit
+We will use the following example RTL, a basic ounter 8bit
 ```verilog
 module counter_8bit (
     input wire clk,        // Clock input
@@ -128,12 +128,23 @@ yosys -c ${PATH_SCRIPTS}/synthesis.tcl
 ```
 
 ## Mapping libraries
-We will add the library that will be use to map our generic netlist. We add a variable in global.sh
-```sh
-export TECH__LIBS="/usr/local/share/pdk/sky130B/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__ss_n40C_1v28.lib"
-```
+We need to cinfigure our PDK and choose the libraries that synthesis tool will use for mapping from generic to standard cells.
+basic PDK config: inside ../libraries folder we add vars_tech.tcl who cotaints the paths and tech's config releated to the PDK that will use on the whole flow.
 
-and add 2 lines to the synthesis script:
+```tcl
+#PDK FOLDER
+set vars(tech,pdk_dir) "../pdk"
+#TECHNOLOGY LEF FILE
+set vars(tech,tlef) "$vars(tech,pdk_dir)/sky130_fd_sc_hd.tlef"
+#LIBRARIES USED
+set vars(tech,libs,max) "$vars(tech,pdk_dir)/sky130_fd_sc_hd__ff_n40C_1v95.lib"
+set vars(tech,libs,tt) "$vars(tech,pdk_dir)/sky130_fd_sc_hd__tt_025C_1v80.lib"
+set vars(tech,libs,min) "$vars(tech,pdk_dir)/sky130_fd_sc_hd__ss_100C_1v60.lib"
+set vars(tech,libs,synthesis) $vars(tech,libs,max)
+```
+where pdk is the folder where the PDK was installed. In our case contains all the PDK files that are necessary to this example.
+
+We need to add 2 lines to the synthesis script for mapping:
 ```tcl
 # mapping to $vars(tech,libs,synthesis)
 dfflibmap -liberty $vars(tech,libs,synthesis)
