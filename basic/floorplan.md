@@ -51,8 +51,13 @@ openroad> gui::show
 ```
 ![image](https://github.com/user-attachments/assets/e3dabea9-99a2-4c00-b71d-624914c33c5c)
 
-We add the tracks.
+**We add the tracks.**
 Tracks are like invisible guide lines that show where the metal wires (routing) can go. They're used during the place-and-route stage to help the design too ls know where it's safe to place wires without violating spacing or design rules
+
+```tcl
+#source the tcl script for track generations for sky130hd PDK
+source $vars(design,path,pdk)/sky130hd.tracks
+```
 
 The rules comes from technology lef. example:
 
@@ -67,8 +72,30 @@ then:
 
 ```tcl
 make_tracks met1 -x_offset 0.17 -x_pitch 0.34 -y_offset 0.17 -y_pitch 0.34
-
-
 ```
+
+![image](https://github.com/user-attachments/assets/0edbef1c-5fde-46b1-b69b-94bba0e3fa3b)
+
+
+### place ports
+We add the ports. the position could be generated ramdonly as We do here or manually. \
+for more info ==> https://openroad.readthedocs.io/en/latest/main/src/ppl/README.html
+
+```tcl
+place_pins -random -hor_layers met3 -ver_layers met2
+```
+
+### tap cells
+Tap cells are special non-logic cells used to connect the substrate or well of the chip to power (VDD) or ground (VSS). They don't perform logic functions — their job is to make sure the transistors inside the chip behave correctly and don't cause electrical problems (latchups)
+Tap cells are inserted regularly across the layout,each x-distance given by the Fab.
+more info ==> https://teamvlsi.com/2020/08/well-tap-cell-in-asic-design.html
+
+```tcl
+tapcell -tapcell_master $vars(tech,tapcell) -distance $vars(tech,tapcell_distance)
+```
+
+![image](https://github.com/user-attachments/assets/48ffd429-def1-4fd7-8fee-59acb24944ef)
+
+### global connections
 
 
