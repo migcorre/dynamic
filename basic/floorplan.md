@@ -51,4 +51,24 @@ openroad> gui::show
 ```
 ![image](https://github.com/user-attachments/assets/e3dabea9-99a2-4c00-b71d-624914c33c5c)
 
+We add the tracks.
+Tracks are like invisible guide lines that show where the metal wires (routing) can go. They're used during the place-and-route stage to help the design too ls know where it's safe to place wires without violating spacing or design rules
+
+The rules comes from technology lef. example:
+
+```tcl
+make_tracks metX -x_offset $OFFSET -x_pitch $PITCH -y_offset $OFFESET -y_pitch $PITCH
+```
+seeing tlef:
+
+![image](https://github.com/user-attachments/assets/24851758-c4b7-406b-b7d9-6e263e0c7671)
+
+then:
+
+```tcl
+make_tracks met1 -x_offset 0.17 -x_pitch 0.34 -y_offset 0.17 -y_pitch 0.34
+
+
+```
+
 
