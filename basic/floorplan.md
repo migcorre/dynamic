@@ -1,4 +1,4 @@
-# Floorplan
+k# Floorplan
 main steps:
   * read libraries (lef, tech lef, timing libraries)
   * read netlist 
@@ -97,5 +97,89 @@ tapcell -tapcell_master $vars(tech,tapcell) -distance $vars(tech,tapcell_distanc
 ![image](https://github.com/user-attachments/assets/48ffd429-def1-4fd7-8fee-59acb24944ef)
 
 ### global connections
+We need connect power and ground instancces pins to a global power/ground net:
 
+```tcl
+add_global_connection -net {VDD} -inst_pattern {.*} -pin_pattern {VPWR} -power    
+add_global_connection -net {VDD} -inst_pattern {.*} -pin_pattern {VPB}
+add_global_connection -net {VSS} -inst_pattern {.*} -pin_pattern {VGND} -ground
+add_global_connection -net {VSS} -inst_pattern {.*} -pin_pattern {VNB}
+global_connect
+```
+add_global_connection maps instance pins (like VPWR, VGND, or VDD, VSS) to global nets (like VDD and VSS). It’s especially useful when the standard cell library uses different pin names for power/ground than your Verilog or DEF.
+
+We define a voltage domain:
+```tcl
+set_voltage_domain -name {CORE} -power {VDD} -ground {VSS}
+```
+
+### power grid
+We will use the power distribution network (PDN) generator module in OpenROAD (pdn) is based on the PDNGEN tool. This utility aims to simplify the process of adding a power grid into a floorplan. The aim is to specify a small set of power grid policies to be applied to the design, such as layers to use, stripe width and spacing, then have the utility generate the actual metal straps. Grid policies can be defined over the stdcell area, and over areas occupied by macros.
+
+for more information ==> https://openroad.readthedocs.io/en/latest/main/src/pdn/README.html
+
+```tcl
+#create the pdn object calls grid
+define_pdn_grid -name {grid} -voltage_domains {CORE}
+#create a ring around the design over metal 4/5.
+add_pdn_ring -grid {grid} -layers {met4 met5} -widths 1.6 -spacings 1.6 -core_offsets 0
+#add met1 strips for standard cells connections
+add_pdn_stripe -grid {grid} -layer {met1} -width {0.48} -pitch {5.44} -offset {0} -followpins -extend_to_core_ring
+#create connection from met until met4
+add_pdn_connect -grid {grid} -layers {met1 met4}
+#craate connections between met4 and met5
+add_pdn_connect -grid {grid} -layers {met4 met5}
+#create pdn
+pdngen
+```
+![image](https://github.com/user-attachments/assets/cb0d6e74-f483-4bd5-ab6e-11a9ac932864)
+
+Finally we generate the floorplan def file and save the floorplan stage .
+
+```tcl
+write_def $vars(design,path,outputs)/floorplan.def
+ord::write_db_cmd $vars(design,path,outputs)/floorplan.odb
+```
+
+### final script:
+
+```tcl
+read_lef $vars(tech,tlef)
+read_lef $vars(tech,stdcell_lefs)
+read_liberty $vars(tech,libs,synthesis)      
+read_verilog $vars(design,path,outputs)/$vars(design,top_name).v
+link_design $vars(design,top_name)
+read_sdc $vars(design,path,inputs)/func.sdc
+initialize_floorplan -site unithd -utilization 10 -aspect_ratio 1.0 -core_space 4.7
+source $vars(design,path,pdk)/sky130hd.tracks
+place_pins -random -hor_layers met3 -ver_layers met2
+
+tapcell -tapcell_master $vars(tech,tapcell) -distance $vars(tech,tapcell_distance)
+
+####################################
+# global connections
+####################################
+add_global_connection -net {VDD} -inst_pattern {.*} -pin_pattern {VPWR} -power
+add_global_connection -net {VDD} -inst_pattern {.*} -pin_pattern {VPB}
+add_global_connection -net {VSS} -inst_pattern {.*} -pin_pattern {VGND} -ground
+add_global_connection -net {VSS} -inst_pattern {.*} -pin_pattern {VNB}
+global_connect
+####################################
+# voltage domains
+####################################
+set_voltage_domain -name {CORE} -power {VDD} -ground {VSS}
+####################################
+# standard cell grid
+####################################
+define_pdn_grid -name {grid} -voltage_domains {CORE}
+add_pdn_ring -grid {grid} -layers {met4 met5} -widths 1.6 -spacings 1.6 -core_offsets 0                                                                                                                        
+add_pdn_stripe -grid {grid} -layer {met1} -width {0.48} -pitch {5.44} -offset {0} -followpins -extend_to_core_ring
+add_pdn_connect -grid {grid} -layers {met1 met4}
+add_pdn_connect -grid {grid} -layers {met4 met5}
+
+pdngen                                                                                                                                                                                                                                      
+                                                                                                                                                                                                                                            
+write_def $vars(design,path,outputs)/floorplan.def                                                                                                                                                                                          
+ord::write_db_cmd $vars(design,path,outputs)/floorplan.o
+```
 
