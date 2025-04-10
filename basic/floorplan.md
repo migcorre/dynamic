@@ -1,4 +1,4 @@
-k# Floorplan
+## Floorplan
 main steps:
   * read libraries (lef, tech lef, timing libraries)
   * read netlist 
