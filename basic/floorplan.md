@@ -178,8 +178,7 @@ add_pdn_connect -grid {grid} -layers {met1 met4}
 add_pdn_connect -grid {grid} -layers {met4 met5}
 
 pdngen                                                                                                                                                                                                                                      
-                                                                                                                                                                                                                                            
-write_def $vars(design,path,outputs)/floorplan.def                                                                                                                                                                                          
-ord::write_db_cmd $vars(design,path,outputs)/floorplan.o
+write_def $vars(design,path,outputs)/floorplan.def
+ord::write_db_cmd $vars(design,path,outputs)/floorplan.odb
 ```
 
