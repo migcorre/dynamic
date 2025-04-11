@@ -95,3 +95,41 @@ You can see that the cells are in site.
 
 ![image](https://github.com/user-attachments/assets/9921a7e3-971d-47b1-9a9d-527984a84313)
 
+the full script:
+
+```tcl
+source ../scripts/common.tcl
+read_db $vars(design,path,outputs)/floorplan.odb
+
+set_routing_layers \
+        -signal ${vars(tech,route,signal,bottom_layer)}-${vars(tech,route,signal,top_layer)} \
+        -clock  ${vars(tech,route,clock,bottom_layer)}-${vars(tech,route,clock,top_layer)}
+
+global_placement -routability_driven -density ${vars(design,place,global,density)}
+
+source $vars(tech,rc)
+set_wire_rc -signal -layer ${vars(tech,route,signal,wire_rc)}
+set_wire_rc -clock  -layer ${vars(tech,route,clock,wire_rc)}
+
+estimate_parasitics -placement
+
+repair_design
+
+repair_tie_fanout -separation $vars(tech,tie_distance) $vars(tech,tielo_port)
+repair_tie_fanout -separation $vars(tech,tie_distance) $vars(tech,tiehi_port)                                                                                                                                                               
+detailed_placement
+
+write_db $vars(design,path,outputs)/place.odb
+```
+
+where ../script/common.tcl is:
+```tcl
+source $::env(PATH_LIBRARIES)/vars_tech.tcl
+source $::env(PATH_INPUTS)/vars_design.tcl      
+source $::env(PATH_SCRIPTS)/utils.tcl              
+read_lef $vars(tech,tlef)
+read_lef $vars(tech,stdcell_lefs)
+read_liberty $vars(tech,libs,synthesis)
+```
+
+We will see this in more detail later.
