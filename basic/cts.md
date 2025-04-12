@@ -35,12 +35,40 @@ set_wire_rc -clock  -layer ${vars(tech,route,clock,wire_rc)}
 The _clock_tree_synthesis_ command in OpenROAD builds the actual clock network, inserting buffers and routing paths, so the clock signal reaches all flip-flops and clocked elements with balanced delays.
 
 ```tcl
-clock_tree_synthesis -root_buf $vars(tech,cts_buffers) -buf_list $vars(tech,cts_buffers)
+clock_tree_synthesis -root_buf $vars(tech,cts_buffers) -buf_list $vars(tech,cts_buffers) -clk_nets {clk}
+```
+Before clock_tree_synthesis...
+
+![image](https://github.com/user-attachments/assets/89fa3004-e7d6-4622-932c-8550842c15a7)
+
+After clock_tree_synthesis...
+
+![image](https://github.com/user-attachments/assets/32f3cb38-a175-4e78-b1b6-b2f055c53282)
+
+As you can see new stdcells were added in clock network
+
+### fix long wires until root buffer
+
+The repair_clock_nets command in OpenROAD is used to optimize clock tree routing by inserting buffers to address long wire lengths between the clock input pin and the root buffer of the clock tree. After clock tree synthesis (clock_tree_synthesis), a long wire may exist, which can cause excessive delays or signal integrity issues. This command mitigates that by adding buffers to break up the wire, reducing RC delay.
+
+```tcl
+estimate_parasitics -placement
+repair_clock_nets
 ```
 
-  * fix long wires until root buffer
-  * legalization of new buffers/inverters added by clock tree synthesis
-  * tool propagates the clocks.
+### legalization of new buffers/inverters added by clock tree synthesis
+We see that the new standard cells added by clock tree synthesis  are overlapping or our of site, for that reason rerun a detailed placement
+```tcl
+detailed_placement
+```
+
+### Propagates the clocks.
+In OpenROAD, the set_propagated_clock command is used to configure the timing analysis to use actual (propagated) clock delays rather than ideal clock delays for a specified clock. This means the tool calculates clock insertion delays and skews based on the physical clock tree network after clock tree synthesis (CTS), instead of assuming ideal, zero-delay clock signals.
+
+```tcl
+set_propagated_clock [all_clocks]
+```
+
   * do a global route.
   * extract RC
   * detail placement
