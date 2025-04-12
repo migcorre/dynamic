@@ -69,6 +69,38 @@ In OpenROAD, the set_propagated_clock command is used to configure the timing an
 set_propagated_clock [all_clocks]
 ```
 
-  * do a global route.
-  * extract RC
-  * detail placement
+### do a global route.
+We do a global routing. We configure the prefered layer for signal and clock routing, do a global routing.
+```tcl
+set_routing_layers \
+        -signal ${vars(tech,route,signal,bottom_layer)}-${vars(tech,route,signal,top_layer)} \
+        -clock  ${vars(tech,route,clock,bottom_layer)}-${vars(tech,route,clock,top_layer)}
+global_route -congestion_iterations 100
+estimate_parasitics -global_routing
+detailed_placement
+```
+
+### final script:
+```tcl
+source ../scripts/common.tcl
+
+read_db $vars(design,path,outputs)/place.odb                                                                                                                                                                        
+source $vars(tech,rc)
+set_wire_rc -signal -layer ${vars(tech,route,signal,wire_rc)}
+set_wire_rc -clock  -layer ${vars(tech,route,clock,wire_rc)}
+
+clock_tree_synthesis -root_buf $vars(tech,cts_buffers) -buf_list $vars(tech,cts_buffers) -clk_nets {clk}
+
+estimate_parasitics -placement
+repair_clock_nets
+detailed_placement                                                                                                                                                                                                  
+set_propagated_clock [all_clocks]
+
+set_routing_layers \
+        -signal ${vars(tech,route,signal,bottom_layer)}-${vars(tech,route,signal,top_layer)} \
+        -clock  ${vars(tech,route,clock,bottom_layer)}-${vars(tech,route,clock,top_layer)}
+global_route -congestion_iterations 100
+estimate_parasitics -global_routing
+detailed_placement                                                                                                                                                                                              
+write_db $vars(design,path,outputs)/cts.odb
+```
