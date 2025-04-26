@@ -49,9 +49,9 @@ After clock_tree_synthesis...
 
 As you can see new stdcells were added in clock network
 
-### fix long wires until root buffer
+### fix long wires
 
-The repair_clock_nets command in OpenROAD is used to optimize clock tree routing by inserting buffers to address long wire lengths between the clock input pin and the root buffer of the clock tree. After clock tree synthesis (clock_tree_synthesis), a long wire may exist, which can cause excessive delays or signal integrity issues. This command mitigates that by adding buffers to break up the wire, reducing RC delay.
+After clock tree synthesis (clock_tree_synthesis), a long wire may exist, which can cause excessive delays or signal integrity issues. This command mitigates that by adding buffers to break up the wire, reducing RC delay.
 
 ```tcl
 estimate_parasitics -placement
@@ -92,25 +92,38 @@ detailed_placement
 
 ### final script:
 ```tcl
+# load utils
 source ../scripts/common.tcl
 
-read_db $vars(design,path,outputs)/place.odb                                                                                                                                                                        
+#load db
+read_db $vars(design,path,outputs)/place.odb
+read_liberty $vars(tech,libs,synthesis)
+source $vars(design,path,inputs)/func.sdc
+
+# configuring RC extration
 source $vars(tech,rc)
 set_wire_rc -signal -layer ${vars(tech,route,signal,wire_rc)}
 set_wire_rc -clock  -layer ${vars(tech,route,clock,wire_rc)}
 
+# clock tree synthesis
 clock_tree_synthesis -root_buf $vars(tech,cts_buffers) -buf_list $vars(tech,cts_buffers) -clk_nets {clk}
 
+# parasitic stimation
 estimate_parasitics -placement
+
+#repait clock nets. Fix long wires
 repair_clock_nets
-detailed_placement                                                                                                                                                                                                  
+
+# legalize cells
+detailed_placement
+
+#report_checks -fields input -digits 3 > $vars(design,path,reports)/cts_timing_before_propagation.rpt
+
+# propagate clocks
 set_propagated_clock [all_clocks]
 
-set_routing_layers \
-        -signal ${vars(tech,route,signal,bottom_layer)}-${vars(tech,route,signal,top_layer)} \
-        -clock  ${vars(tech,route,clock,bottom_layer)}-${vars(tech,route,clock,top_layer)}
-global_route -congestion_iterations 100
-estimate_parasitics -global_routing
-detailed_placement                                                                                                                                                                                              
-write_db $vars(design,path,outputs)/cts.odb
+#report_checks -fields input -digits 3 > $vars(design,path,reports)/cts_timing_after_propagation.rpt
+
+#save data base                                                                                                                                                                                                                             
+write_db $vars(design,path,outputs)/cts.odb                    
 ```
