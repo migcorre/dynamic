@@ -6,30 +6,32 @@ We will use a project_name folder from where we will deploy the following struct
 ```
 ├── workspace/
     └── run_syn.sh
-├── sourcecode/
+├── design/
     └── rtl/
         └── counter.v
     └── tb/
         └── tb.v
-├── inputs/
+    └── src/
+        └── func.db
+├── setup/
     └── vars_tech.tcl
     └── vars_design.tcl
 ├── outputs/
     └── dbs/
-    └── exports
-├── reports/
-├── scripts/
+    └── logs
+    └── reports
+├── flow/
     └── synthesis.tcl
 ├── pdk
 
 ```
 
 workspace = directory where we can find the main executable of each stage (synthesys, floorplan,place,cts...) \
-inputs = all the necesary files for the tools \
+setup = all the necesary files for tool configuration and design parameters \
 outputs = all the outputs dropped by the tools \
 reports = all reports coming from tool \
-scripts = main scripts that will execute by stage \
-sourcecode = directory with designs files definitios. \
+flow = main scripts that will execute by stage \
+design = directory with designs files definitios. \
 pdk = files necesaries to run this example. Files inside this folder are getting from a real PDK and here you can find the necessary ones for run this example.
 
 
@@ -84,13 +86,17 @@ We see global variables that will be load previus synthesis script. They are spe
 # MAIN PATHS FOR THIS DESIGN
 ###########################################################
 set vars(design,path,pdk) $::env(PATH_PDK)
-set vars(design,path,libraries) $::env(PATH_LIBRARIES)
-set vars(design,path,inputs) $::env(PATH_INPUTS)
+set vars(design,path,setup) $::env(PATH_SETUP)
 set vars(design,path,outputs) $::env(PATH_OUTPUTS)
+set vars(design,path,dbs) $::env(PATH_DBS)
+set vars(design,path,logs) $::env(PATH_LOGS)
 set vars(design,path,rtl) $::env(PATH_RTL)
-set vars(design,path,scripts) $::env(PATH_SCRIPTS)
-set vars(design,path,sourcecode) $::env(PATH_SOURCECODE)
+set vars(design,path,sdc) $::env(PATH_SDC)
+set vars(design,path,flow) $::env(PATH_FLOW)
+set vars(design,path,design) $::env(PATH_DESIGN)
 set vars(design,path,workspace) $::env(PATH_WORKSPACE)
+set vars(design,path,reports) $::env(PATH_REPORTS)
+
 
 ############################################################
 # CONFIG DESIGN
@@ -106,13 +112,17 @@ We see enviroment variables, these are coming from a global variables in env.sh 
 #
 export PATH_ABS_MAIN_PATH_WORK="$(pwd)"
 export PATH_OUTPUTS="../outputs"
-export PATH_LIBRARIES="../libraries"
 export PATH_WORKSPACE="../workspace"
 export PATH_PDK="../pdk"
-export PATH_SOURCECODE="../sourcecode"
-export PATH_RTL="../sourcecode/rtl"
-export PATH_SCRIPTS="../scripts"
-export PATH_INPUTS="../inputs"
+export PATH_DESIGN="../design"
+export PATH_SDC="../design/sdc"
+export PATH_RTL="../design/rtl"
+export PATH_FLOW="../flow"
+export PATH_SETUP="../setup"
+export PATH_REPORTS="../outputs/reports"
+export PATH_LOGS="../outputs/logs"
+export PATH_DBS="../outputs/dbs"
+
 ```
 
 we will lauch all from a workspace directory under main folder.
@@ -154,11 +164,11 @@ clean
 then our final synthesis script:
 
 ```tcl
-yosys -import 
+osys -import
 #design variables
-source $::env(PATH_INPUTS)/vars_design.tcl
+source $::env(PATH_SETUP)/vars_design.tcl
 #tech variables
-source $vars(design,path,libraries)/vars_tech.tcl
+source $vars(design,path,setup)/vars_tech.tcl
 
 # read verilog
 read_verilog $vars(design,path,rtl)/counter.v
@@ -166,12 +176,11 @@ read_verilog $vars(design,path,rtl)/counter.v
 # elaborate design hierarchy
 hierarchy -check -top $vars(design,top_name)
 
-synth -top $vars(design,top_name) 
+synth -top $vars(design,top_name)
 
 dfflibmap -liberty $vars(tech,libs,synthesis)
 abc -liberty $vars(tech,libs,synthesis)
-clean
-
-# write synthesized design
-write_verilog $vars(design,path,outputs)/$vars(design,top_name).v
+clean                                                                                                                                                                                                                     
+# write synthesized design                                                                                                                                                                                     
+write_verilog $vars(design,path,dbs)/$vars(design,top_name).v     
 ```
