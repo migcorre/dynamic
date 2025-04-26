@@ -27,12 +27,14 @@ global_placement -routability_driven -density ${vars(design,place,global,density
 ```
 In this case we enable routability-driven mode (other could be Routability-Driven), with a target density of ${vars(design,place,global,density)}
 
-![image](https://github.com/user-attachments/assets/1edc18ff-8ea9-4e26-82ed-4f6890c85320)
+![image](https://github.com/user-attachments/assets/66d8de12-cb5d-4b91-adea-38bf38ba16dd)
+
 
 As you can see is a generic placement some cells are overlapped:
 
-![image](https://github.com/user-attachments/assets/c31d51c5-8eba-4f5a-8941-541469c1d0b0)
+![image](https://github.com/user-attachments/assets/5264f5f6-c697-4fde-81db-de0360b43fea)
 
+the command detail_placement fix this. But first we need to configure the engine to do some maths over Resistance and capacitance and to have in this way the real delay (in this case, at placement stage an stimate)
 
 ### Set global capacitance and resitance in the net
 set_wire_rc sets the resistance (R) and capacitance (C) values used by OpenROAD to estimate wire delays before detailed routing is complete. Because actual routing hasn’t happened yet, tools need a model to predict how wires will affect timing.
