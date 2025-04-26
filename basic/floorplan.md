@@ -1,43 +1,12 @@
 ## Floorplan
 main steps:
-  * read libraries (lef, tech lef, timing libraries)
-  * read netlist 
-  * link design
+
+  * read init database
   * initialize floorplan
   * place ports design
   * tapcells insertion
   * global connections
   * power grid
-
-
-### read libraries:
-
-```tcl
-#read technology LEF.
-#A LEF (Library Exchange Format) technology is a file that contains the manufacturing rules and the physical and electrical characteristics of a VLSI design.
-read_lef $vars(tech,tlef)
-# Read standard cells LEF
-# A standard cell LEF (Library Exchange Format) file is an ASCII representation of the physical layout of standard cells in a VLSI design.
-# It's used to describe the physical aspects of cells, such as their dimensions, pin locations, and routing blockages    
-read_lef $vars(tech,stdcell_lefs)                                                                                                                                                                               # Read library cells. 
-#The timing library (. lib) is an ASCII representation of the Timing, Power and Area associated with the standard cells. Characterization of cells
-#under different PVT conditions results in the timing library (. lib). The delay calculation happens based on input transition (Slew) and the output capacitance (Load) 
-read_liberty $vars(tech,libs,synthesis)
-```
-### read netlist:
-
-```tcl
-#verlig netlist 
-read_verilog $vars(design,path,outputs)/$vars(design,top_name).v
-```
-
-### link design:
-
-```tcl
-#link_design resolves all the module references and connects the top-level module with the definitions provided by the loaded Liberty (.lib) files and
-#LEF (for physical info). It makes the design ready for placement, timing analysis, and optimization.
-link_design $vars(design,top_name)
-```
 
 ### initialize floorplan:
 ```tcl
@@ -142,29 +111,19 @@ pdngen
 Finally we generate the floorplan def file and save the floorplan stage .
 
 ```tcl
-write_def $vars(design,path,outputs)/floorplan.def
-ord::write_db_cmd $vars(design,path,outputs)/floorplan.odb
+write_def $vars(design,path,dbs)/floorplan.def
+write_db $vars(design,path,dbs)/floorplan.odb
 ```
 
 ### final script:
 
 ```tcl
 #read common utils for the flow
-source ../scripts/common.tcl
+source $::env(PATH_FLOW)/common.tcl
 
-#read lefs and libs
-read_lef $vars(tech,tlef)
-read_lef $vars(tech,stdcell_lefs)
+read_db $vars(design,path,dbs)/init.odb
 read_liberty $vars(tech,libs,synthesis)
-
-#read the verilog
-read_verilog $vars(design,path,outputs)/$vars(design,top_name).v
-
-#link libraries with verilog
-link_design $vars(design,top_name)
-
-#read the constraints
-read_sdc $vars(design,path,inputs)/func.sdc
+read_sdc $vars(design,path,sdc)/func.sdc
 
 # initialize a floorplan 
 initialize_floorplan -site unithd -utilization 10 -aspect_ratio 1.0 -core_space 4.7
@@ -175,7 +134,7 @@ source $vars(design,path,pdk)/sky130hd.tracks
 # custom pins location
 place_pin -pin_name clk -layer met4 -location {30 0} -force_to_die_boundary
 place_pin -pin_name reset -layer met2 -location {40 0} -force_to_die_boundary
-place_pins -random -ver_layers met2 -hor_layer met3 -exclude left:* -exclude right:* -exclude bottom:* -group_pins count* -corner_avoidance 20 -min_distance 4 -min_distance_in_tracks
+place_pins -random -ver_layers met2 -hor_layer met3 -exclude left:* -exclude right:* -exclude bottom:* -group_pins count* -corner_avoidance 20 -min_distance 4 -min_distance_in_tracks 
 
 # tapcells insertion
 tapcell -tapcell_master $vars(tech,tapcell) -distance $vars(tech,tapcell_distance)
@@ -184,28 +143,28 @@ tapcell -tapcell_master $vars(tech,tapcell) -distance $vars(tech,tapcell_distanc
 # Power Grid Generation
 ####################################
 
-# global connections                                                                                                                                                                                                                        
-add_global_connection -net {VDD} -inst_pattern {.*} -pin_pattern {VPWR} -power                                                                                                                                                              
-add_global_connection -net {VDD} -inst_pattern {.*} -pin_pattern {VPB}                                                                                                                                                                      
-add_global_connection -net {VSS} -inst_pattern {.*} -pin_pattern {VGND} -ground                                                                                                                                                             
-add_global_connection -net {VSS} -inst_pattern {.*} -pin_pattern {VNB}                                                                                                                                                                      
-global_connect                                                                                                                                                                                                                              
-                                                                                                                                                                                                                                            
-# voltage domains                                                                                                                                                                                                                           
-set_voltage_domain -name {CORE} -power {VDD} -ground {VSS}                                                                                                                                                                                  
-                                                                                                                                                                                                                                            
-# standard cell power/ground connections                                                                                                                                                                                                    
-define_pdn_grid -name {grid} -voltage_domains {CORE}                                                                                                                                                                                        
-add_pdn_ring -grid {grid} -layers {met4 met5} -widths 1.6 -spacings 1.6 -core_offsets 0                                                                                                                                                     
-add_pdn_stripe -grid {grid} -layer {met1} -width {0.48} -pitch {5.44} -offset {0} -followpins -extend_to_core_ring                                                                                                                          
-add_pdn_connect -grid {grid} -layers {met1 met4}                                                                                                                                                                                            
-add_pdn_connect -grid {grid} -layers {met4 met5}                                                                                                                                                                                            
-                                                                                                                                                                                                                                            
-#run the pdn generator                                                                                                                                                                                                                      
+# global connections 
+add_global_connection -net {VDD} -inst_pattern {.*} -pin_pattern {VPWR} -power
+add_global_connection -net {VDD} -inst_pattern {.*} -pin_pattern {VPB}
+add_global_connection -net {VSS} -inst_pattern {.*} -pin_pattern {VGND} -ground
+add_global_connection -net {VSS} -inst_pattern {.*} -pin_pattern {VNB}
+global_connect
+
+# voltage domains
+set_voltage_domain -name {CORE} -power {VDD} -ground {VSS}
+
+# standard cell power/ground connections
+define_pdn_grid -name {grid} -voltage_domains {CORE}
+add_pdn_ring -grid {grid} -layers {met4 met5} -widths 1.6 -spacings 1.6 -core_offsets 0
+add_pdn_stripe -grid {grid} -layer {met1} -width {0.48} -pitch {5.44} -offset {0} -followpins -extend_to_core_ring
+add_pdn_connect -grid {grid} -layers {met1 met4}
+add_pdn_connect -grid {grid} -layers {met4 met5}
+
+#run the pdn generator
 pdngen
 
-write_def $vars(design,path,outputs)/floorplan.def
-write_db $vars(design,path,outputs)/floorplan.odb
-                                                                            
+write_def $vars(design,path,dbs)/floorplan.def
+write_db $vars(design,path,dbs)/floorplan.odb
+
 ```
 
