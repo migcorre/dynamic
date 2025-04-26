@@ -164,7 +164,7 @@ clean
 then our final synthesis script:
 
 ```tcl
-osys -import
+yosys -import
 #design variables
 source $::env(PATH_SETUP)/vars_design.tcl
 #tech variables
