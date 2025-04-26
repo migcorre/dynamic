@@ -1,6 +1,6 @@
 # Placement
 
-main steps:
+Main steps:
   * config global routing
   * run global placement
   * set global capacitance and resitance in the net
@@ -70,7 +70,8 @@ repair_design
     [-verbose]
 ```
 
-![image](https://github.com/user-attachments/assets/1562f389-fca1-4c69-9f5c-928a0c8f5818)
+![image](https://github.com/user-attachments/assets/04efe7d5-e901-433b-8c4a-8e447e35129c)
+
 
 This command is hand by the module [Risizer module](https://github.com/The-OpenROAD-Project/OpenROAD/blob/master/src/rsz/README.md)
 This module manages the _set_wire_rc_ and _estimate_parasitics_ 
@@ -91,11 +92,13 @@ The -detailed_placement- command performs detailed placement of instances to leg
 
 The detailed placement module in OpenROAD (dpl) is based on [OpenDP](https://github.com/sanggido/OpenDP), or Open-Source Detailed Placement Engine
 
-![image](https://github.com/user-attachments/assets/c2be48b7-c3aa-4255-a018-8057e6701074)
+![image](https://github.com/user-attachments/assets/8e183d91-dbe2-415f-8807-fe43c0da899d)
+
 
 You can see that the cells are in site.
 
-![image](https://github.com/user-attachments/assets/9921a7e3-971d-47b1-9a9d-527984a84313)
+![image](https://github.com/user-attachments/assets/3cb08caa-7821-416e-a25c-42fa32d5b254)
+
 
 the full script:
 
