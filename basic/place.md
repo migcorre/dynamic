@@ -103,14 +103,12 @@ You can see that the cells are in site.
 the full script:
 
 ```tcl
-# read common utils
-source ../scripts/common.tcl
+source $::env(PATH_FLOW)/common.tcl
 
 #read floorplan data base (we need provide the libarties and sdc)
-read_db $vars(design,path,outputs)/floorplan.odb
+read_db $vars(design,path,dbs)/floorplan.odb
 read_liberty $vars(tech,libs,synthesis)
-read_sdc $vars(design,path,inputs)/func.sdc
-
+read_sdc $vars(design,path,sdc)/func.sdc                                                                                                                                                                            
 # config global routing. which metal will be used for signals and clocks
 set_routing_layers \
         -signal ${vars(tech,route,signal,bottom_layer)}-${vars(tech,route,signal,top_layer)} \
@@ -135,17 +133,9 @@ repair_tie_fanout -separation $vars(tech,tie_distance) $vars(tech,tielo_port)
 repair_tie_fanout -separation $vars(tech,tie_distance) $vars(tech,tiehi_port)
 
 # detail placement
-detailed_placement                                                                                                                                                                                                                          
-                                                                                                                                                                                                                                            
-# save db                                                                                                                                                                                                                                   
-write_db $vars(design,path,outputs)/place.odb                      
-```
-
-where ../script/common.tcl is:
-```tcl
-source $::env(PATH_LIBRARIES)/vars_tech.tcl
-source $::env(PATH_INPUTS)/vars_design.tcl      
-source $::env(PATH_SCRIPTS)/utils.tcl              
+detailed_placement                                                                                                                                                                                                  
+# save db
+write_db $vars(design,path,dbs)/place.odb           
 ```
 
 We will see this in more detail later.
