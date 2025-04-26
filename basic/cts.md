@@ -39,11 +39,13 @@ clock_tree_synthesis -root_buf $vars(tech,cts_buffers) -buf_list $vars(tech,cts_
 ```
 Before clock_tree_synthesis...
 
-![image](https://github.com/user-attachments/assets/89fa3004-e7d6-4622-932c-8550842c15a7)
+![image](https://github.com/user-attachments/assets/1872638c-d073-4ee1-aa62-afb8ff76a445)
+
 
 After clock_tree_synthesis...
 
-![image](https://github.com/user-attachments/assets/32f3cb38-a175-4e78-b1b6-b2f055c53282)
+![image](https://github.com/user-attachments/assets/465bf4de-a27d-48c4-8ef1-907db757f7cd)
+
 
 As you can see new stdcells were added in clock network
 
@@ -68,6 +70,14 @@ In OpenROAD, the set_propagated_clock command is used to configure the timing an
 ```tcl
 set_propagated_clock [all_clocks]
 ```
+
+here the report timing before and after clock propagation:
+
+![image](https://github.com/user-attachments/assets/498ebd7f-4af0-45c6-9274-6a94852904e6)
+
+
+![image](https://github.com/user-attachments/assets/305295f5-3860-4725-9835-30f5c43af1b9)
+
 
 ### do a global route.
 We do a global routing. We configure the prefered layer for signal and clock routing, do a global routing.
