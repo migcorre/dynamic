@@ -92,13 +92,13 @@ detailed_placement
 
 ### final script:
 ```tcl
-# load utils
-source ../scripts/common.tcl
+# load utils                   
+source $::env(PATH_FLOW)/common.tcl
 
 #load db
-read_db $vars(design,path,outputs)/place.odb
+read_db $vars(design,path,dbs)/place.odb
 read_liberty $vars(tech,libs,synthesis)
-source $vars(design,path,inputs)/func.sdc
+source $vars(design,path,sdc)/func.sdc
 
 # configuring RC extration
 source $vars(tech,rc)
@@ -124,6 +124,6 @@ set_propagated_clock [all_clocks]
 
 #report_checks -fields input -digits 3 > $vars(design,path,reports)/cts_timing_after_propagation.rpt
 
-#save data base                                                                                                                                                                                                                             
-write_db $vars(design,path,outputs)/cts.odb                    
+#save data base
+write_db $vars(design,path,dbs)/cts.odb              
 ```
