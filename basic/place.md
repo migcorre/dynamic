@@ -103,28 +103,42 @@ You can see that the cells are in site.
 the full script:
 
 ```tcl
+# read common utils
 source ../scripts/common.tcl
-read_db $vars(design,path,outputs)/floorplan.odb
 
+#read floorplan data base (we need provide the libarties and sdc)
+read_db $vars(design,path,outputs)/floorplan.odb
+read_liberty $vars(tech,libs,synthesis)
+read_sdc $vars(design,path,inputs)/func.sdc
+
+# config global routing. which metal will be used for signals and clocks
 set_routing_layers \
         -signal ${vars(tech,route,signal,bottom_layer)}-${vars(tech,route,signal,top_layer)} \
         -clock  ${vars(tech,route,clock,bottom_layer)}-${vars(tech,route,clock,top_layer)}
 
+#global placement command
 global_placement -routability_driven -density ${vars(design,place,global,density)}
 
+#Set global capacitance and resitance in the net
 source $vars(tech,rc)
 set_wire_rc -signal -layer ${vars(tech,route,signal,wire_rc)}
 set_wire_rc -clock  -layer ${vars(tech,route,clock,wire_rc)}
 
+# Generic parasitic estimation
 estimate_parasitics -placement
 
+# repair transition/capacitance/fanout
 repair_design
 
+# tie cells insertion
 repair_tie_fanout -separation $vars(tech,tie_distance) $vars(tech,tielo_port)
-repair_tie_fanout -separation $vars(tech,tie_distance) $vars(tech,tiehi_port)                                                                                                                                                               
-detailed_placement
+repair_tie_fanout -separation $vars(tech,tie_distance) $vars(tech,tiehi_port)
 
-write_db $vars(design,path,outputs)/place.odb
+# detail placement
+detailed_placement                                                                                                                                                                                                                          
+                                                                                                                                                                                                                                            
+# save db                                                                                                                                                                                                                                   
+write_db $vars(design,path,outputs)/place.odb                      
 ```
 
 where ../script/common.tcl is:
@@ -132,9 +146,6 @@ where ../script/common.tcl is:
 source $::env(PATH_LIBRARIES)/vars_tech.tcl
 source $::env(PATH_INPUTS)/vars_design.tcl      
 source $::env(PATH_SCRIPTS)/utils.tcl              
-read_lef $vars(tech,tlef)
-read_lef $vars(tech,stdcell_lefs)
-read_liberty $vars(tech,libs,synthesis)
 ```
 
 We will see this in more detail later.
