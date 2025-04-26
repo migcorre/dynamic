@@ -1,3 +1,9 @@
+## init design
+Main Steps
+ - read libraries
+ - read netlist
+ - link design
+
 ### read libraries:
 
 ```tcl
@@ -26,7 +32,7 @@ read_verilog $vars(design,path,outputs)/$vars(design,top_name).v
 #LEF (for physical info). It makes the design ready for placement, timing analysis, and optimization.
 link_design $vars(design,top_name)
 ```
-Final script
+### Final script
 ```tcl
 #read common utils for the flow
 source $::env(PATH_FLOW)/common.tcl
